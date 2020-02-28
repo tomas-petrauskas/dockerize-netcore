@@ -1,23 +1,37 @@
-FROM mcr.microsoft.com/dotnet/core/sdk:3.1 AS build-env
+# Sample Application
+Use sample code to create .NET Core Web Application
+![nncggk.png](https://img.esteem.app/nncggk.png)
+![24q684.png](https://img.esteem.app/24q684.png)
 
-WORKDIR /app/WebApplication
+# Docker Ignore
+To build an application we only need Source Code, let's ignore unnecessary files like *./obj* or *./bin*.
 
-# Since we need to Restore Packages only when Project File is changed, we need to copy project file separately
-COPY ./WebApplication/*.csproj ./
-RUN dotnet restore
+# Dockerfile
+We will use Microsoft official [SDK](https://hub.docker.com/_/microsoft-dotnet-core-sdk/) and [Runtime](https://hub.docker.com/_/microsoft-dotnet-core-aspnet/) Docker Containers to Build and Run .NET Core Application. This will make Application Container lighter since it will not include Source Code, only artifacts and libraries etc. Please replace Application name if needed.
 
-WORKDIR /app
-COPY ./WebApplication/. ./WebApplication
-WORKDIR /app/WebApplication
-RUN dotnet publish -c Release -o out
 
-# Build runtime image
-FROM mcr.microsoft.com/dotnet/core/aspnet:3.1
-WORKDIR /app
-COPY --from=build-env /app/WebApplication/out .
+# Build
 
-# Expose 80 Port
-EXPOSE 80
+Build Docker Container from *Dockerfile* file in current directory:
+`docker build -t web-application .`
 
-# Execute Application
-ENTRYPOINT ["dotnet", "WebApplication.dll"]
+![6wx1dy.png](https://img.esteem.app/6wx1dy.png)
+
+# Execute
+
+Run built web-application container in detached mode with *api* name and *Port 80* accessible to *localhost*:
+`docker run -d -p 80:80 --name api web-application`
+
+![x7ltsw.png](https://img.esteem.app/x7ltsw.png)
+
+# Test
+
+To test if Application runs, open [http://localhost](http://localhost) URL in a Web Browser.
+
+![5v73bk.png](https://img.esteem.app/5v73bk.png)
+
+# Stop and Remove Container
+
+`docker stop api && docker rm api`
+
+![oduv34.png](https://img.esteem.app/oduv34.png)
